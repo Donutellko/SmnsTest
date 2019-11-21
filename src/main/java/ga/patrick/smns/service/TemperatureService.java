@@ -23,4 +23,8 @@ public class TemperatureService {
     public Temperature add(Temperature t) {
         return temperatureRepository.save(t);
     }
+
+    public void clear() {
+        temperatureRepository.deleteAll();
+    }
 }
