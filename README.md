@@ -21,10 +21,13 @@ You can describe, how would you do optional tasks in words in case it seems diff
 
 # Build
 
-Use `gradlew bootRun` to start the application.
-Use `gradlew testClasses` to start JUnit tests.
+Use `gradlew bootRun` to start the application.  
 
-The project is developed in IntelliJ IDEA, so running the project from it might be a preffered option.
+Application will be accessible on port `8080` by default: `http://localhost:8080/`
+
+The project is developed in IntelliJ IDEA, and does not seem to require any additional setup, 
+so running the project in IDEA might be the best option.
+
 
 # Implementation
 
@@ -90,7 +93,7 @@ Expected response:
 These endpoints are not specified in task description, but were added for convenience during manual testing and for 
 demonstration purposes.
 There are also sensitive commands, such as `clear`, and this API is not secured from access, as it is not meant to be 
-in production.
+in production. It is also why I didn't cover this API by any tests.  
 
 ### Populate database
 
@@ -137,12 +140,13 @@ It is possible to add an additional request field to clarify, which scale (Celci
 also to convert every value to same scale, before saving it, for consistency. 
 
 ## Database population
-For database population there is `src/test/populate.sh` file, which contains curl request with random values.
+For database population there is a `/test/populate?count=X` request, which generates random values.  
+There is also `src/test/populate.sh` shell script file, which contains curl requests.  
 
 ## Testing
 I manually add some components to context for integration tests:
 
-```java
+```
 @ContextConfiguration(
   classes = {
     TestJpaConfig.class, 
