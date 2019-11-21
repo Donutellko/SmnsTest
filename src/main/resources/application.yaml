@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    username: user
+    password: password
+  h2:
+    console:
+      enabled: true
+      settings.web-allow-others: false
