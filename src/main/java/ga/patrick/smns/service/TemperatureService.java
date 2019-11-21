@@ -19,4 +19,8 @@ public class TemperatureService {
                 PageRequest.of(0, n)
         );
     }
+
+    public Temperature add(Temperature t) {
+        return temperatureRepository.save(t);
+    }
 }
