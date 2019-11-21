@@ -1,21 +1,29 @@
 package ga.patrick.smns.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import ga.patrick.smns.TestJpaConfig;
+import ga.patrick.smns.domain.Temperature;
+import ga.patrick.smns.dto.TemperatureDto;
 import ga.patrick.smns.repository.TemperatureRepository;
 import ga.patrick.smns.service.TemperatureService;
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import javax.annotation.Resource;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 //@SpringBootTest
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -27,11 +35,18 @@ public class ApiAddIntegrationTest {
 
     private MockMvc mockMvc;
 
+    private static final Matcher<String>
+            INVALID_LATITUDE_MATCHER = Matchers.containsString("Invalid latitude: "),
+            INVALID_LONGITUDE_MATCHER = Matchers.containsString("Invalid longitude: "),
+            INVALID_TEMPERATURE_MATCHER = Matchers.containsString("Invalid temperature: ");
+
     @Resource
     private TemperatureRepository temperatureRepository;
 
     @Autowired
     private ApiErrorHandler apiErrorHandler;
+
+    private ObjectMapper mapper = new ObjectMapper();
 
     @Before
     public void init() {
@@ -47,72 +62,102 @@ public class ApiAddIntegrationTest {
         temperatureRepository.deleteAll();
     }
 
-    @Test
-    public void addCorrect1() throws Exception {
-        mockMvc.perform(
+    private String toJson(Object o) throws JsonProcessingException {
+        return mapper.writeValueAsString(o);
+    }
+
+    private ResultActions performPostAdd(Temperature t) throws Exception {
+        TemperatureDto body = new TemperatureDto(t);
+        return mockMvc.perform(
                 post("/add")
-                        .param("lat", "90.0")
-                        .param("lon", "180.0")
-                        .param("value", "10.0")
-        ).andExpect(status().isOk());
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .content(toJson(body)));
+    }
+
+    @Test
+    public void addCorrect() throws Exception {
+        double lat = 90;
+        double lon = 180;
+        double temperature = 10;
+
+        performPostAdd(new Temperature(temperature, lat, lon))
+                .andExpect(status().isOk());
     }
 
     @Test
     public void addNoData() throws Exception {
         mockMvc.perform(
                 post("/add")
-        ).andExpect(status().is4xxClientError());
+        ).andExpect(status().isBadRequest());
     }
 
 
     @Test
     public void addTooBigLat() throws Exception {
-        mockMvc.perform(
-                post("/add")
-                        .param("lat", "91.0")
-                        .param("lon", "180.0")
-                        .param("value", "10.0")
-        );
+        double lat = 91;
+        double lon = 180;
+        double temperature = 10;
+
+        performPostAdd(new Temperature(temperature, lat, lon))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(INVALID_LATITUDE_MATCHER));
     }
 
     @Test
     public void addTooSmallLat() throws Exception {
-        mockMvc.perform(
-                post("/add")
-                        .param("lat", "-91.0")
-                        .param("lon", "180.0")
-                        .param("value", "10.0")
-        ).andExpect(status().is4xxClientError());
+        double lat = -91;
+        double lon = 180;
+        double temperature = 10;
+
+        performPostAdd(new Temperature(temperature, lat, lon))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(INVALID_LATITUDE_MATCHER));
     }
 
     @Test
     public void addTooBigLon() throws Exception {
-        mockMvc.perform(
-                post("/add")
-                        .param("lat", "10.0")
-                        .param("lon", "181.0")
-                        .param("value", "10.0")
-        ).andExpect(status().is4xxClientError());
+        double lat = 10;
+        double lon = 181;
+        double temperature = 10;
+
+        performPostAdd(new Temperature(temperature, lat, lon))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(INVALID_LONGITUDE_MATCHER));
     }
 
     @Test
     public void addTooSmallLon() throws Exception {
-        mockMvc.perform(
-                post("/add")
-                        .param("lat", "10.0")
-                        .param("lon", "-181.0")
-                        .param("value", "10.0")
-        ).andExpect(status().is4xxClientError());
+        double lat = 10;
+        double lon = -181;
+        double temperature = 10;
+
+        performPostAdd(new Temperature(temperature, lat, lon))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(INVALID_LONGITUDE_MATCHER));
     }
 
     @Test
     public void addTooSmallTemp() throws Exception {
-        mockMvc.perform(
-                post("/add")
-                        .param("lat", "10.0")
-                        .param("lon", "10.0")
-                        .param("value", "-500.0")
-        ).andExpect(status().is4xxClientError());
+        double lat = 10;
+        double lon = 10;
+        double temperature = -500;
+
+        performPostAdd(new Temperature(temperature, lat, lon))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(INVALID_TEMPERATURE_MATCHER));
     }
 
+    /** When several constraints are violated, there should be a message for each of them. */
+    @Test
+    public void addInvalidLatLonTemp() throws Exception {
+        double lat = 500;
+        double lon = 500;
+        double temperature = -500;
+
+        performPostAdd(new Temperature(temperature, lat, lon))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(INVALID_LATITUDE_MATCHER))
+                .andExpect(content().string(INVALID_LONGITUDE_MATCHER))
+                .andExpect(content().string(INVALID_TEMPERATURE_MATCHER));
+    }
 }

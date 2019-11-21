@@ -1,6 +1,7 @@
 package ga.patrick.smns.api;
 
 import ga.patrick.smns.domain.Temperature;
+import ga.patrick.smns.dto.TemperatureDto;
 import ga.patrick.smns.service.TemperatureService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Class for demonstration and testing purposes.
@@ -25,7 +28,7 @@ public class TestingApi {
     }
 
     @RequestMapping("/populate")
-    List<Temperature> populate(
+    List<TemperatureDto> populate(
             @RequestParam(name = "count", defaultValue = "20") int count
     ) {
         List<Temperature> added = new ArrayList<>();
@@ -37,7 +40,7 @@ public class TestingApi {
             );
             added.add(temperatureService.add(t));
         }
-        return added;
+        return added.stream().map(TemperatureDto::new).collect(Collectors.toList());
     }
 
     @RequestMapping("/clear")

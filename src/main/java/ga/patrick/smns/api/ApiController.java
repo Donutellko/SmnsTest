@@ -1,12 +1,14 @@
 package ga.patrick.smns.api;
 
 import ga.patrick.smns.domain.*;
+import ga.patrick.smns.dto.TemperatureDto;
 import ga.patrick.smns.service.*;
 import lombok.AllArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @AllArgsConstructor
@@ -15,24 +17,20 @@ public class ApiController {
     private TemperatureService temperatureService;
 
     @GetMapping("/latest")
-    List<Temperature> latestEntries(
+    List<TemperatureDto> latestEntries(
             @RequestParam(name = "count", defaultValue = "10") int n
     ) {
-        return temperatureService.lastInputs(n);
+        return temperatureService.lastInputs(n).stream()
+                .map(TemperatureDto::new)
+                .collect(Collectors.toList());
     }
 
     @PostMapping("/add")
     long add(
-            @RequestParam(name = "lat") double lat,
-            @RequestParam(name = "lon") double lon,
-            @RequestParam(name = "value") double temperature,
-            @RequestParam(name = "time", required = false) LocalDateTime datetime
+            @Validated @RequestBody TemperatureDto temp
     ) {
-        Temperature t = new Temperature(lat, lon, temperature);
-        if (datetime != null) t.setDatetime(datetime);
-        Temperature added = temperatureService.add(t);
+        Temperature added = temperatureService.add(temp.toEntity());
         return added.getId();
     }
-
 
 }

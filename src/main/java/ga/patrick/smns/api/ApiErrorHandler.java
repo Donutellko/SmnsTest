@@ -40,6 +40,8 @@ public class ApiErrorHandler implements Filter {
                 response.reset();
                 response.getWriter().write(s);
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            } else {
+                throw ex;
             }
         }
     }

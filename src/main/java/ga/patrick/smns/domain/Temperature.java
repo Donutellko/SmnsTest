@@ -18,7 +18,7 @@ public class Temperature {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long id;
+    private Long id;
 
     /** Temperature.
      * Assuming that all values are in same scale.
@@ -39,12 +39,10 @@ public class Temperature {
     @LongitudeConstraint
     private double lon;
 
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @Column(nullable = false)
     private LocalDateTime datetime = LocalDateTime.now();
 
-    public Temperature(double lat, double lon, double temperature) {
+    public Temperature(double temperature, double lat, double lon) {
         this.lat = lat;
         this.lon = lon;
         this.temperature = temperature;

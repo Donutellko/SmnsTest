@@ -3,6 +3,7 @@ package ga.patrick.smns.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ga.patrick.smns.TestJpaConfig;
 import ga.patrick.smns.domain.Temperature;
+import ga.patrick.smns.dto.TemperatureDto;
 import ga.patrick.smns.repository.TemperatureRepository;
 import ga.patrick.smns.service.TemperatureService;
 import org.junit.After;
@@ -44,7 +45,7 @@ public class ApiLatestIntegrationTest {
     @Autowired
     private ApiErrorHandler apiErrorHandler;
 
-    private List<Temperature> addedEntries = new ArrayList<>();
+    private List<TemperatureDto> addedEntries = new ArrayList<>();
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -57,7 +58,7 @@ public class ApiLatestIntegrationTest {
         temperatureRepository.deleteAll();
         for (int i = 0; i < 15; i++) {
             Temperature t = new Temperature(i, i, i);
-            addedEntries.add(temperatureRepository.save(t));
+            addedEntries.add(new TemperatureDto(temperatureRepository.save(t)));
         }
     }
 
@@ -73,23 +74,23 @@ public class ApiLatestIntegrationTest {
         );
     }
 
-    private Temperature[] deserialize(MvcResult result) throws IOException {
+    private TemperatureDto[] deserialize(MvcResult result) throws IOException {
         String responseString = result.getResponse().getContentAsString();
-        return mapper.readValue(responseString, Temperature[].class);
+        return mapper.readValue(responseString, TemperatureDto[].class);
     }
 
-    private Temperature[] latestEntries(int n) {
+    private TemperatureDto[] latestEntries(int n) {
         int size = Math.min(addedEntries.size(), n);
-        List<Temperature> latestN = addedEntries.subList(addedEntries.size() - size, addedEntries.size());
+        List<TemperatureDto> latestN = addedEntries.subList(addedEntries.size() - size, addedEntries.size());
         Collections.reverse(latestN);
-        Temperature[] t = new Temperature[size];
+        TemperatureDto[] t = new TemperatureDto[size];
         latestN.toArray(t);
         return t;
     }
 
     private void testLatest(int count) throws Exception {
         MvcResult result = perform(count).andExpect(status().isOk()).andReturn();
-        Temperature[] response = deserialize(result);
+        TemperatureDto[] response = deserialize(result);
         assertArrayEquals(latestEntries(count), response);
     }
 
