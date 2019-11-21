@@ -27,17 +27,17 @@ public class Temperature {
      */
     @Column(nullable = false)
     @TemperatureConstraint
-    private double temperature;
+    private Double temperature;
 
     /** Latitude of sensor. Value is between -90 and 90. */
     @Column(nullable = false)
     @LatitudeConstraint
-    private double lat;
+    private Double lat;
 
     /** Longitude of sensor. Value is between -180 and 180. */
     @Column(nullable = false)
     @LongitudeConstraint
-    private double lon;
+    private Double lon;
 
     @Column(nullable = false)
     private LocalDateTime datetime = LocalDateTime.now();

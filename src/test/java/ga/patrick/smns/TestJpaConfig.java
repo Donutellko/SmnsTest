@@ -29,8 +29,6 @@ public class TestJpaConfig {
     public DataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setUrl("jdbc:h2:mem:myDb;DB_CLOSE_DELAY=-1");
-//        dataSource.setUsername(env.getProperty("jdbc.user"));
-//        dataSource.setPassword(env.getProperty("jdbc.pass"));
 
         return dataSource;
     }
@@ -57,9 +55,6 @@ public class TestJpaConfig {
 
         hibernateProperties.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
         hibernateProperties.setProperty("hibernate.hbm2ddl.auto", "create");
-//        hibernateProperties.setProperty("hibernate.show_sql", env.getProperty("hibernate.show_sql"));
-//        hibernateProperties.setProperty("hibernate.cache.use_second_level_cache", env.getProperty("hibernate.cache.use_second_level_cache"));
-//        hibernateProperties.setProperty("hibernate.cache.use_query_cache", env.getProperty("hibernate.cache.use_query_cache"));
 
         return hibernateProperties;
     }
