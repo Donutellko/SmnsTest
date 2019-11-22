@@ -1,9 +1,11 @@
 package ga.patrick.smns.api;
 
 import ga.patrick.smns.domain.Temperature;
+import ga.patrick.smns.dto.ModelMapper;
 import ga.patrick.smns.dto.TemperatureDto;
 import ga.patrick.smns.service.TemperatureService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +25,8 @@ public class TestingApi {
 
     TemperatureService temperatureService;
 
+    private ModelMapper modelMapper;
+
     private double getRand(double min, double max) {
         return (Math.random() * (max - min)) + min;
     }
@@ -40,7 +44,7 @@ public class TestingApi {
             );
             added.add(temperatureService.add(t));
         }
-        return added.stream().map(TemperatureDto::new).collect(Collectors.toList());
+        return added.stream().map(modelMapper::toDto).collect(Collectors.toList());
     }
 
     @RequestMapping("/clear")

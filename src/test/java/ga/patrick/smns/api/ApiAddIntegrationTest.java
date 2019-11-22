@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ga.patrick.smns.TestJpaConfig;
 import ga.patrick.smns.domain.Temperature;
+import ga.patrick.smns.dto.ModelMapper;
 import ga.patrick.smns.dto.TemperatureDto;
 import ga.patrick.smns.repository.TemperatureRepository;
 import ga.patrick.smns.service.TemperatureService;
@@ -19,6 +20,7 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.ui.Model;
 
 import javax.annotation.Resource;
 
@@ -28,33 +30,45 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 //@SpringBootTest
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-        classes = {TestJpaConfig.class, ApiErrorHandler.class},
+        classes = {
+                TestJpaConfig.class,
+                ApiErrorHandler.class,
+                TemperatureService.class,
+                ApiController.class,
+                ModelMapper.class},
         loader = AnnotationConfigContextLoader.class
 )
 public class ApiAddIntegrationTest {
 
     private MockMvc mockMvc;
+    @Resource
+    private TemperatureRepository temperatureRepository;
+
+    @Autowired
+    private ApiController apiController;
+
+    @Autowired
+    private ApiErrorHandler apiErrorHandler;
+
+    @Autowired
+    private ModelMapper modelMapper;
+
+    private ObjectMapper mapper = new ObjectMapper();
 
     private static final Matcher<String>
             INVALID_LATITUDE_MATCHER = Matchers.containsString("Invalid latitude: "),
             INVALID_LONGITUDE_MATCHER = Matchers.containsString("Invalid longitude: "),
             INVALID_TEMPERATURE_MATCHER = Matchers.containsString("Invalid temperature: ");
 
-    @Resource
-    private TemperatureRepository temperatureRepository;
-
-    @Autowired
-    private ApiErrorHandler apiErrorHandler;
-
-    private ObjectMapper mapper = new ObjectMapper();
 
     @Before
     public void init() {
         temperatureRepository.deleteAll();
 
-        mockMvc = MockMvcBuilders.standaloneSetup(
-                new ApiController(new TemperatureService(temperatureRepository))
-        ).addFilters(apiErrorHandler).build();
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(apiController)
+                .addFilters(apiErrorHandler)
+                .build();
     }
 
     @After
@@ -67,7 +81,7 @@ public class ApiAddIntegrationTest {
     }
 
     private ResultActions performPostAdd(Temperature t) throws Exception {
-        TemperatureDto body = new TemperatureDto(t);
+        TemperatureDto body = modelMapper.toDto(t);
         return mockMvc.perform(
                 post("/add")
                         .contentType(MediaType.APPLICATION_JSON_UTF8)

@@ -1,6 +1,7 @@
 package ga.patrick.smns.api;
 
 import ga.patrick.smns.domain.*;
+import ga.patrick.smns.dto.ModelMapper;
 import ga.patrick.smns.dto.TemperatureDto;
 import ga.patrick.smns.service.*;
 import lombok.AllArgsConstructor;
@@ -16,12 +17,14 @@ public class ApiController {
 
     private TemperatureService temperatureService;
 
+    private ModelMapper modelMapper;
+
     @GetMapping("/latest")
     List<TemperatureDto> latestEntries(
             @RequestParam(name = "count", defaultValue = "10") int n
     ) {
         return temperatureService.lastInputs(n).stream()
-                .map(TemperatureDto::new)
+                .map(modelMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -29,7 +32,7 @@ public class ApiController {
     long add(
             @Validated @RequestBody TemperatureDto temp
     ) {
-        Temperature added = temperatureService.add(temp.toEntity());
+        Temperature added = temperatureService.add(modelMapper.toEntity(temp));
         return added.getId();
     }
 

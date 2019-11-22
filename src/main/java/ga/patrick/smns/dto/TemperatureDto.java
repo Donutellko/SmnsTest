@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import ga.patrick.smns.domain.Temperature;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -36,18 +35,4 @@ public class TemperatureDto {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime time;
 
-    public Temperature toEntity() {
-        Temperature t = new Temperature(value, lat, lon);
-        if (time != null) t.setDatetime(time);
-        if (id != null) t.setId(id);
-        return t;
-    }
-
-    public TemperatureDto(Temperature entity) {
-        this.id = entity.getId();
-        this.lat = entity.getLat();
-        this.lon = entity.getLon();
-        this.value = entity.getTemperature();
-        this.time = entity.getDatetime();
-    }
 }

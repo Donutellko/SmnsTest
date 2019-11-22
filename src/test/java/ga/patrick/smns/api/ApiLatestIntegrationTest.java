@@ -3,6 +3,7 @@ package ga.patrick.smns.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ga.patrick.smns.TestJpaConfig;
 import ga.patrick.smns.domain.Temperature;
+import ga.patrick.smns.dto.ModelMapper;
 import ga.patrick.smns.dto.TemperatureDto;
 import ga.patrick.smns.repository.TemperatureRepository;
 import ga.patrick.smns.service.TemperatureService;
@@ -32,7 +33,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 //@SpringBootTest
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-        classes = {TestJpaConfig.class, ApiErrorHandler.class},
+        classes = {
+                TestJpaConfig.class,
+                ApiErrorHandler.class,
+                TemperatureService.class,
+                ApiController.class,
+                ModelMapper.class},
         loader = AnnotationConfigContextLoader.class
 )
 public class ApiLatestIntegrationTest {
@@ -43,7 +49,13 @@ public class ApiLatestIntegrationTest {
     private TemperatureRepository temperatureRepository;
 
     @Autowired
+    private ApiController apiController;
+
+    @Autowired
     private ApiErrorHandler apiErrorHandler;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     private List<TemperatureDto> addedEntries = new ArrayList<>();
 
@@ -51,14 +63,15 @@ public class ApiLatestIntegrationTest {
 
     @Before
     public void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(
-                new ApiController(new TemperatureService(temperatureRepository))
-        ).addFilters(apiErrorHandler).build();
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(apiController)
+                .addFilters(apiErrorHandler)
+                .build();
 
         temperatureRepository.deleteAll();
         for (int i = 0; i < 15; i++) {
             Temperature t = new Temperature(i, i, i);
-            addedEntries.add(new TemperatureDto(temperatureRepository.save(t)));
+            addedEntries.add(modelMapper.toDto(temperatureRepository.save(t)));
         }
     }
 
