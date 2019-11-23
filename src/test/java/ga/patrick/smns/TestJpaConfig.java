@@ -19,7 +19,7 @@ import java.util.Properties;
 
 @Configuration
 @EnableJpaRepositories(basePackages = "ga.patrick.smns.repository")
-@PropertySource("test-jpa.yaml")
+//@PropertySource("test-jpa.yaml")
 @EnableTransactionManagement
 public class TestJpaConfig {
     @Autowired

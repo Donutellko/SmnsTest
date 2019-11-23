@@ -12,6 +12,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
@@ -30,17 +32,9 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-//@SpringBootTest
+@SpringBootTest
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
-        classes = {
-                TestJpaConfig.class,
-                ApiErrorHandler.class,
-                TemperatureService.class,
-                ApiController.class,
-                ModelMapper.class},
-        loader = AnnotationConfigContextLoader.class
-)
+@WithMockUser(roles = "USER")
 public class ApiLatestIntegrationTest {
 
     private MockMvc mockMvc;
@@ -54,6 +48,7 @@ public class ApiLatestIntegrationTest {
     @Autowired
     private ApiErrorHandler apiErrorHandler;
 
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private ModelMapper modelMapper;
 
@@ -82,7 +77,7 @@ public class ApiLatestIntegrationTest {
 
     private ResultActions perform(int count) throws Exception {
         return mockMvc.perform(
-                get("/latest")
+                get("/api/latest")
                         .param("count", String.valueOf(count))
         );
     }
@@ -106,6 +101,7 @@ public class ApiLatestIntegrationTest {
         TemperatureDto[] response = deserialize(result);
         assertArrayEquals(latestEntries(count), response);
     }
+
 
     @Test
     public void latestOne() throws Exception {

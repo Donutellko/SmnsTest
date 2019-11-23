@@ -11,8 +11,8 @@ stores it. The user is able to get the list of last 10 inputs.
 •	Cover functionality with unit- and integration tests  
 •	Provide scripts to populate DB (please, use in-memory DB)  
 
-## Optional, not compulsory (none, any or all):   
-•	Basic authorization for both client and sensor  
+## Optional, not compulsory (none, any or all):
+•	Basic authorization for both client and sensor
 •	Extend the application by adding a feature to filter by city. The city should be retrieved automatically from the 
     given coordinates  
 •	Implement basic UI (use your favorite JS framework)  
@@ -43,9 +43,42 @@ More to come:
 
 ## Endpoints
 
+### Login
+```http
+POST /login
+```
+
+Required parameters:
+* username 
+* password 
+
+#### Roles
+
+There are three levels of access:
+* SENSOR: can only access `/api/add`;
+* USER: can access `/api/**`;
+* ADMIN: can access `/test/**`.
+
+There is account for each role for testing and demonstration purposes.
+Logins are: admin, user and sensor, and password is `smns`. 
+
+### Authentication example
+
+We may use this request to login and store a cookie to a file: 
+```shell script
+curl -i -X POST -d username=user -d password=smns -c ~/cookies.txt \
+ http://localhost:8080/login
+```
+
+And then use the saved cookie with further request like this:
+```shell script
+curl -i --header "Accept:application/json" -X GET -b ~/cookies.txt \
+ http://localhost:8080/api/latest
+```
+
 ### Add new input to database
 ```http
-POST /add
+POST /api/add
 ```
 Required parameters: 
 * lat latitude
@@ -59,10 +92,11 @@ Expected response:
 * `200 OK` and an `ID` of an added row as a payload, if added successfully.
 * `400 BAD REQUEST` and human-readable violated constraint names and values which are not correct, as a payload. 
 Example: `Invalid longitude: 1337.0; Invalid latitude: 1337.0`
+* `403 FORBIDDEN` if user is not authorised
 
 ### Get last inputs
 ```http
-GET /latest
+GET /api/latest
 ```
 
 Optional parameters:
@@ -87,6 +121,7 @@ Expected response:
     }, ...
   ]
   ```
+* `403 FORBIDDEN` if user is not authorised
 
 ## Endpoints for testing purposes
 
@@ -143,20 +178,7 @@ also to convert every value to same scale, before saving it, for consistency.
 For database population there is a `/test/populate?count=X` request, which generates random values.  
 There is also `src/test/populate.sh` shell script file, which contains curl requests.  
 
-## Testing
-I manually add some components to context for integration tests:
-
-```
-@ContextConfiguration(
-  classes = {
-    TestJpaConfig.class, 
-    ApiErrorHandler.class
-  }, ...
-)
-```
-That's because not all components automatically load into Context in testing phase, in particular, built-in and custom
- filters. I am not sure, if it doing so is OK, but I tried `@SpringBootTest` annotation and several other ways, but 
- couldn't force loading of the whole context, identical to how it happens during actual run.
+## Testing 
 
 ### Unit-tests
 I couldn't find any functionality which is not covered completely by integration tests.   
