@@ -7,12 +7,11 @@ public class TemperatureValidator implements ConstraintValidator<TemperatureCons
 
     /**
      * Minimal values for different scales are: -273.15C, -459.67F and 0K.
-     * Thus, valid temperature must be not less than -459.67.
-     * At the moment we assume that all the values are in any one of these scales.
+     * Update: all values are in Celsius, so minimal is -273.15.
      */
     @Override
     public boolean isValid(Double value, ConstraintValidatorContext context) {
-        return -459.67 <= value;
+        return -273.15 <= value;
     }
 
 }

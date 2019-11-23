@@ -21,9 +21,7 @@ public class Temperature {
     private Long id;
 
     /** Temperature.
-     * Assuming that all values are in same scale.
-     * Minimal values for different scales are: -273.15C, -459.67F and 0K.
-     * Thus, valid values must be not less than -459.67.
+     * Values are in Celsius, minimal value is -273.15.
      */
     @Column(nullable = false)
     @TemperatureConstraint
