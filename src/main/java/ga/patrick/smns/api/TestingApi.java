@@ -37,10 +37,10 @@ public class TestingApi {
     ) {
         List<Temperature> added = new ArrayList<>();
         for (int i = 0; i < count; i++) {
-            Temperature t = new     Temperature(
+            Temperature t = new Temperature(
+                    getRand(-273, 500),
                     getRand(-90, 90),
-                    getRand(-180, 180),
-                    getRand(-273, 500)
+                    getRand(-180, 180)
             );
             added.add(temperatureService.add(t));
         }
