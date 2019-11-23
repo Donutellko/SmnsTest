@@ -90,7 +90,7 @@ public class ApiAddIntegrationTest {
     public void addCorrect() throws Exception {
         double lat = 90;
         double lon = 180;
-        double temperature = 10;
+        double temperature = -273.15;
 
         performPostAdd(new Temperature(temperature, lat, lon))
                 .andExpect(status().isOk());
@@ -151,7 +151,7 @@ public class ApiAddIntegrationTest {
     public void addTooSmallTemp() throws Exception {
         double lat = 10;
         double lon = 10;
-        double temperature = -500;
+        double temperature = -273.16;
 
         performPostAdd(new Temperature(temperature, lat, lon))
                 .andExpect(status().isBadRequest())
@@ -161,9 +161,9 @@ public class ApiAddIntegrationTest {
     /** When several constraints are violated, there should be a message for each of them. */
     @Test
     public void addInvalidLatLonTemp() throws Exception {
-        double lat = 500;
-        double lon = 500;
-        double temperature = -500;
+        double lat = 91;
+        double lon = 181;
+        double temperature = -273.16;
 
         performPostAdd(new Temperature(temperature, lat, lon))
                 .andExpect(status().isBadRequest())
