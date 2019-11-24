@@ -38,19 +38,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .exceptionHandling()
-                .authenticationEntryPoint(restAuthenticationEntryPoint)
-                .and()
-                .authorizeRequests()
-                .antMatchers("/api/add").authenticated()
-                .antMatchers("/api/**").hasRole("USER")
-                .antMatchers("/test/**").hasRole("ADMIN")
+//                .authenticationEntryPoint(restAuthenticationEntryPoint)
                 .and()
                 .formLogin()
-                .loginPage("/login")
+//                .loginPage("/login")
+//                .loginProcessingUrl("/login")
+//                .defaultSuccessUrl("/")
+//                .failureUrl("/login?error=true")
+                .and()
+                .authorizeRequests()
+                .anyRequest().authenticated()
+                .antMatchers("/api/**").hasRole("USER")
+                .antMatchers("/**").hasRole("ADMIN")
 //                .successHandler(mySuccessHandler)
 //                .failureHandler(myFailureHandler)
                 .and()
-                .logout();
+                .headers().frameOptions().sameOrigin()
+                .and()
+                .logout()
+        ;
     }
 
 }

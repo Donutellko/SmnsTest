@@ -1,0 +1,30 @@
+html {
+  box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+table td,
+table th {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+#wrapper,
+#wrapper > div {
+  display: flex;
+  flex-direction: column;
+}
+#wrapper > div {
+  margin: 10pt;
+  padding: 10pt;
+}
+#wrapper #menu {
+  flex-direction: row;
+  border-bottom: black;
+}
+#wrapper #admin-zone {
+  border: 3px solid red;
+}
+/*# sourceMappingURL=index.css.map */

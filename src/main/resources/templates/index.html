@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="../static/index.css" th:href="@{/index.css}">
+
+    <title>SmnsTest UI</title>
+</head>
+<body>
+
+<div id="wrapper" style="" ng-app="app" ng-init="">
+
+    <div id="header">
+        <a href="/logout">Logout</a>
+    </div>
+
+    <div id="admin-zone" ng-controller="adminCtrl" ng-show="roles.indexOf('ROLE_ADMIN') >= 0">
+        <h2>Admin zone:</h2>
+
+        <label>
+            Count to populate:
+            <input type="number" ng-model="populateCount">
+        </label>
+        <button ng-click="populateDb()">Populate</button>
+
+        <br>
+
+        <button ng-click="clearDb()">Clear</button>
+    </div>
+
+    <div id="user-zone" ng-controller="userCtrl" ng-show="roles.indexOf('ROLE_USER') >= 0">
+        <button ng-click="getLatest()">Refresh</button>
+        <table>
+            <tr>
+                <th>Id</th>
+                <th>Date and time</th>
+                <th>Latitide</th>
+                <th>Longitude</th>
+                <th>Temperature</th>
+            </tr>
+            <tr ng-repeat="input in latest track by input.id">
+                <td>{{input.id}}</td>
+                <td>{{input.time}}</td>
+                <td>{{input.lat}}</td>
+                <td>{{input.lon}}</td>
+                <td>{{input.value}}</td>
+            </tr>
+        </table>
+    </div>
+
+
+    <div id="sensor-zone" ng-controller="sensorCtrl">
+
+        <form>
+            <label>Temperature
+                <input type="number" ng-model="input.value">
+            </label>
+
+            <br>
+
+            <label>Latitude
+                <input type="number" ng-model="input.lat">
+            </label>
+
+            <br>
+
+            <label>Longitude
+                <input type="number" ng-model="input.lon">
+            </label>
+
+            <br>
+
+            <!-- <input type="submit" ng-click="add">-->
+            <button ng-click="addInput()">Add</button>
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<script src="../static/index.js" th:src="@{/index.js}"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    roles = [[${roles}]];
+    app.factory('userFactory', function () {
+        return {
+            roles: [[${roles}]]
+        };
+    });
+    /*]]>*/
+</script>
+
+</html>

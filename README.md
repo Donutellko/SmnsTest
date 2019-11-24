@@ -35,11 +35,11 @@ Used technologies are:
   1. Spring Framework (Boot, MVC, Data JPA)
   2. Hibernate
   3. JUnit
+  4. AngularJS
+  5. Less
 
 More to come:
   * Feign (with Geocode API)
-  * AngularJS
-  * 
 
 ## Endpoints
 
