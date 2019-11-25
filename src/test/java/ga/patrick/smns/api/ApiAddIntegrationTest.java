@@ -1,32 +1,15 @@
 package ga.patrick.smns.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import ga.patrick.smns.TestJpaConfig;
-import ga.patrick.smns.config.*;
 import ga.patrick.smns.domain.Temperature;
-import ga.patrick.smns.dto.ModelMapper;
-import ga.patrick.smns.dto.TemperatureDto;
-import ga.patrick.smns.repository.TemperatureRepository;
-import ga.patrick.smns.service.TemperatureService;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import javax.annotation.Resource;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -38,20 +21,11 @@ public class ApiAddIntegrationTest {
 
     private MockMvc mockMvc;
 
-    @Resource
-    private TemperatureRepository temperatureRepository;
-
     @Autowired
-    private ApiController apiController;
+    TestSharedService testUtils;
 
     @Autowired
     private ApiErrorHandler apiErrorHandler;
-
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    @Autowired
-    private ModelMapper modelMapper;
-
-    private ObjectMapper mapper = new ObjectMapper();
 
     private static final Matcher<String>
             INVALID_LATITUDE_MATCHER = Matchers.containsString("Invalid latitude: "),
@@ -61,30 +35,19 @@ public class ApiAddIntegrationTest {
 
     @Before
     public void init() {
-        temperatureRepository.deleteAll();
+        testUtils.cleanup();
 
         mockMvc = MockMvcBuilders
-                .standaloneSetup(apiController)
+                .standaloneSetup(testUtils.apiController)
                 .addFilters(apiErrorHandler)
                 .build();
     }
 
     @After
     public void cleanup() {
-        temperatureRepository.deleteAll();
+        testUtils.cleanup();
     }
 
-    private String toJson(Object o) throws JsonProcessingException {
-        return mapper.writeValueAsString(o);
-    }
-
-    private ResultActions performPostAdd(Temperature t) throws Exception {
-        TemperatureDto body = modelMapper.toDto(t);
-        return mockMvc.perform(
-                post("/api/add")
-                        .contentType(MediaType.APPLICATION_JSON_UTF8)
-                        .content(toJson(body)));
-    }
 
     @Test
     public void addCorrect() throws Exception {
@@ -92,7 +55,7 @@ public class ApiAddIntegrationTest {
         double lon = 180;
         double temperature = -273.15;
 
-        performPostAdd(new Temperature(temperature, lat, lon))
+        testUtils.performPostAdd(mockMvc, new Temperature(temperature, lat, lon))
                 .andExpect(status().isOk());
     }
 
@@ -109,7 +72,7 @@ public class ApiAddIntegrationTest {
         double lon = 180;
         double temperature = 10;
 
-        performPostAdd(new Temperature(temperature, lat, lon))
+        testUtils.performPostAdd(mockMvc, new Temperature(temperature, lat, lon))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(INVALID_LATITUDE_MATCHER));
     }
@@ -120,7 +83,7 @@ public class ApiAddIntegrationTest {
         double lon = 180;
         double temperature = 10;
 
-        performPostAdd(new Temperature(temperature, lat, lon))
+        testUtils.performPostAdd(mockMvc, new Temperature(temperature, lat, lon))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(INVALID_LATITUDE_MATCHER));
     }
@@ -131,7 +94,7 @@ public class ApiAddIntegrationTest {
         double lon = 181;
         double temperature = 10;
 
-        performPostAdd(new Temperature(temperature, lat, lon))
+        testUtils.performPostAdd(mockMvc, new Temperature(temperature, lat, lon))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(INVALID_LONGITUDE_MATCHER));
     }
@@ -142,7 +105,7 @@ public class ApiAddIntegrationTest {
         double lon = -181;
         double temperature = 10;
 
-        performPostAdd(new Temperature(temperature, lat, lon))
+        testUtils.performPostAdd(mockMvc, new Temperature(temperature, lat, lon))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(INVALID_LONGITUDE_MATCHER));
     }
@@ -153,7 +116,7 @@ public class ApiAddIntegrationTest {
         double lon = 10;
         double temperature = -273.16;
 
-        performPostAdd(new Temperature(temperature, lat, lon))
+        testUtils.performPostAdd(mockMvc, new Temperature(temperature, lat, lon))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(INVALID_TEMPERATURE_MATCHER));
     }
@@ -165,7 +128,7 @@ public class ApiAddIntegrationTest {
         double lon = 181;
         double temperature = -273.16;
 
-        performPostAdd(new Temperature(temperature, lat, lon))
+        testUtils.performPostAdd(mockMvc, new Temperature(temperature, lat, lon))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(INVALID_LATITUDE_MATCHER))
                 .andExpect(content().string(INVALID_LONGITUDE_MATCHER))

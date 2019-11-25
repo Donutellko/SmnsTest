@@ -39,18 +39,11 @@ public class ApiLatestIntegrationTest {
 
     private MockMvc mockMvc;
 
-    @Resource
-    private TemperatureRepository temperatureRepository;
-
     @Autowired
-    private ApiController apiController;
+    TestSharedService testUtils;
 
     @Autowired
     private ApiErrorHandler apiErrorHandler;
-
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    @Autowired
-    private ModelMapper modelMapper;
 
     private List<TemperatureDto> addedEntries = new ArrayList<>();
 
@@ -58,28 +51,27 @@ public class ApiLatestIntegrationTest {
 
     @Before
     public void init() {
+
+        testUtils.cleanup();
+
         mockMvc = MockMvcBuilders
-                .standaloneSetup(apiController)
+                .standaloneSetup(testUtils.apiController)
                 .addFilters(apiErrorHandler)
                 .build();
 
-        temperatureRepository.deleteAll();
         for (int i = 0; i < 15; i++) {
             Temperature t = new Temperature(i, i, i);
-            addedEntries.add(modelMapper.toDto(temperatureRepository.save(t)));
+            addedEntries.add(testUtils.map(testUtils.temperatureRepository.save(t)));
         }
     }
 
     @After
     public void cleanup() {
-        temperatureRepository.deleteAll();
+        testUtils.cleanup();
     }
 
     private ResultActions perform(int count) throws Exception {
-        return mockMvc.perform(
-                get("/api/latest")
-                        .param("count", String.valueOf(count))
-        );
+        return testUtils.performGetLatest(mockMvc, count);
     }
 
     private TemperatureDto[] deserialize(MvcResult result) throws IOException {

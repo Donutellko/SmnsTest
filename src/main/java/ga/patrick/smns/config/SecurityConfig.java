@@ -16,8 +16,6 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 @AllArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
-
     @Bean
     public PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
@@ -37,25 +35,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .exceptionHandling()
-//                .authenticationEntryPoint(restAuthenticationEntryPoint)
+                    .formLogin()
                 .and()
-                .formLogin()
-//                .loginPage("/login")
-//                .loginProcessingUrl("/login")
-//                .defaultSuccessUrl("/")
-//                .failureUrl("/login?error=true")
+                    .authorizeRequests()
+                        .antMatchers("/*").hasAnyRole("SENSOR", "USER", "ADMIN")
+                        .antMatchers("/api/add").hasAnyRole("SENSOR", "USER", "ADMIN")
+                        .antMatchers("/api/**").hasAnyRole("USER", "ADMIN")
+                        .anyRequest().hasRole("ADMIN")
                 .and()
-                .authorizeRequests()
-                .anyRequest().authenticated()
-                .antMatchers("/api/**").hasRole("USER")
-                .antMatchers("/**").hasRole("ADMIN")
-//                .successHandler(mySuccessHandler)
-//                .failureHandler(myFailureHandler)
+                    .headers().frameOptions().sameOrigin()
                 .and()
-                .headers().frameOptions().sameOrigin()
-                .and()
-                .logout()
+                    .logout()
         ;
     }
 
