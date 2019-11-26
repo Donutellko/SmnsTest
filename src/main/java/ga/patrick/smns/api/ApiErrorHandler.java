@@ -1,5 +1,8 @@
 package ga.patrick.smns.api;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.web.util.NestedServletException;
@@ -9,10 +12,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
 public class ApiErrorHandler implements Filter {
+
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {}
@@ -34,16 +42,30 @@ public class ApiErrorHandler implements Filter {
             if (e instanceof TransactionSystemException) {
                 ConstraintViolationException cve
                         = (ConstraintViolationException) e.getCause().getCause();
-                String s = cve.getConstraintViolations().stream()
+
+                List<String> constraints = cve.getConstraintViolations().stream()
                         .map((cv) -> cv.getMessage() + ": " + cv.getInvalidValue())
-                        .collect(Collectors.joining("; "));
+                        .collect(Collectors.toList());
+
+                String payload = formErrorJson("Constraint violation.", constraints);
+
                 response.reset();
-                response.getWriter().write(s);
+                response.getWriter().write(payload);
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             } else {
                 throw ex;
             }
+        } catch (Exception ex) {
+            throw ex;
         }
+    }
+
+    private String formErrorJson(String desc, List<String> violations) throws JsonProcessingException {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("success", false);
+        payload.put("message", desc);
+        payload.put("violated", violations);
+        return objectMapper.writeValueAsString(payload);
     }
 
     @Override

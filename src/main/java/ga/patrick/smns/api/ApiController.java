@@ -20,6 +20,10 @@ public class ApiController {
 
     private ModelMapper modelMapper;
 
+    /**
+     * Retrieve latest responses from database. Ordered by descending ID (new to old)
+     * @param n max count of elements to retrieve, 10 by default.
+     */
     @GetMapping("/latest")
     List<TemperatureDto> latestEntries(
             @RequestParam(name = "count", defaultValue = "10") int n
@@ -29,12 +33,16 @@ public class ApiController {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Add new input into database.
+     * @return an object stored into database, so client can see ID and other generated data.
+     */
     @PostMapping("/add")
-    long add(
+    TemperatureDto add(
             @Validated @RequestBody TemperatureDto temp
     ) {
         Temperature added = temperatureService.add(modelMapper.toEntity(temp));
-        return added.getId();
+        return modelMapper.toDto(added);
     }
 
 }

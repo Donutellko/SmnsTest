@@ -1,11 +1,21 @@
 const app = angular.module("app", []);
 
-function handleError(err) {
-    alert("Error!");
-    console.log(err);
+function showMessage(str) {
+    alert(str);
 }
 
-app.service('sharedService', function() {
+function handleError(err) {
+    let message = `${err.data == null ? "Error!" : err.data.message}`;
+    if (err.data.violated != null) {
+        for (let violation of err.data.violated) {
+            message += '\n' + violation;
+        }
+    }
+    console.log(err);
+    showMessage(message);
+}
+
+app.service('sharedService', function () {
 
 });
 
@@ -17,14 +27,14 @@ app.controller('adminCtrl', function ($scope, $http, userFactory) {
 
     $scope.populateDb = function () {
         $http.get(`/test/populate?count=${$scope.populateCount}`).then(
-            (response) => alert("Populated!"),
+            (response) => showMessage("Populated."),
             (err) => handleError(err)
         )
     };
 
     $scope.clearDb = function () {
         $http.get("/test/clear").then(
-            (response) => alert("Cleared!"),
+            (response) => showMessage(response.data.message),
             (err) => handleError(err)
         )
     };
@@ -57,9 +67,8 @@ app.controller('sensorCtrl', function ($scope, $http) {
     };
 
     $scope.addInput = function () {
-        console.log("Hello!");
         $http.post("/api/add", $scope.input).then(
-            (response) => alert("Added"),
+            (response) => showMessage("Added."),
             (err) => handleError(err)
         )
     };

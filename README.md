@@ -89,10 +89,18 @@ Optional parameters:
 * time: date and time
 
 Expected response:
-* `200 OK` and an `ID` of an added row as a payload, if added successfully.
-* `400 BAD REQUEST` and human-readable violated constraint names and values which are not correct, as a payload. 
+* `200 OK` and an object of an added row as a payload, if added successfully.
+* `400 BAD REQUEST` and human-readable violated constraint names and values which are not correct, as a payload.
+    Example: 
+    ```json
+    {
+      "success": false,
+      "message": "Constraint violation",
+      "vilated": ["Invalid latitude: 1337", "Invalid temperature: -9000"]
+    }
+    ``` 
 Example: `Invalid longitude: 1337.0; Invalid latitude: 1337.0`
-* `403 FORBIDDEN` if user is not authorised
+* `401 FORBIDDEN` if user is not authenticated
 
 ### Get last inputs
 ```http
@@ -121,7 +129,8 @@ Expected response:
     }, ...
   ]
   ```
-* `403 FORBIDDEN` if user is not authorised
+* `401 UNAUTHORIZED` if user is not authenticated
+* `403 FORBIDDEN` if user is not authorized
 
 ## Endpoints for testing purposes
 
@@ -139,6 +148,9 @@ GET /test/populate
 Optional parameters:
 * `count`: amount of entries to be added. Default value is 20.
 
+Response:
+* JSON containing list of all generated inputs.
+
 The generated entries contain random values as temperature, longitude and latitude, and datetime is a timestamp of when 
 this entry was created.
 
@@ -149,7 +161,37 @@ GET /test/clear
 ```
 
 Removes all entries from database.
+Response: 
+```json
+{
+  "success": true,
+  "message": "Cleared."
+}
+```
 
+### Basic UI
+
+**Is in development. There are currently several issues:**
+* Error while performing getting /latest, when logged in as SENSOR.  
+* Error message for some operations, even if they have been successful.  
+* User is able to get only 10 latest inputs, however API supports specifying this number.  
+* No datetime input for add operation, however API supports it.  
+* Design is ugly.  
+
+```http
+GET /
+```
+
+Some sort of cabinet for a user. It contains several elements:  
+* Menu:
+  Contains just a single Logout button. Nice and simple.
+* Admin zone:  
+  Available for role ADMIN only. Contains two buttons: to populate DB with example data (entered into a field nearby), and 
+  to clear the DB.
+* User zone:
+  Available for role USER. Contains table, filled by 10 latest entries. Reload button.
+* Sensor zone:
+  Fields for temperature, latitude and longitude. A button to send it. 
 
 ## Comments
 
@@ -168,11 +210,7 @@ once with several inputs and simulate several cases:
 
 Alternatively, I could have used `@BeforeEach` to clear and fill database before testing each of these cases instead, 
 and it might be reasonable for actual project, but I right now I don't see or know a strong reason to do make it, and 
-decided to keep it this, more simple and fast, way.
-
-### Measurment scales
-It is possible to add an additional request field to clarify, which scale (Celcius, Fahrenheit or Kelvin) is used, and 
-also to convert every value to same scale, before saving it, for consistency. 
+decided to keep it this, more simple and fast, way. 
 
 ## Database population
 For database population there is a `/test/populate?count=X` request, which generates random values.  
