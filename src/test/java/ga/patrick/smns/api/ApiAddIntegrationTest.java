@@ -3,22 +3,21 @@ package ga.patrick.smns.api;
 import ga.patrick.smns.domain.Temperature;
 import ga.patrick.smns.dto.TemperatureDto;
 import ga.patrick.smns.geocode.GeocodeClient;
-import ga.patrick.smns.geocode.GeocodeResponse;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -76,7 +75,7 @@ public class ApiAddIntegrationTest {
                 .andReturn();
         String json = result.getResponse().getContentAsString();
         TemperatureDto added = testUtils.parseTemperatureDto(json);
-        assertEquals("Россия, Санкт-Петербург", added.getLocation());
+        assertEquals("Санкт-Петербург, Россия", added.getLocation());
 
     }
 

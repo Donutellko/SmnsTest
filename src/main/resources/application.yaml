@@ -1,7 +1,7 @@
 spring:
   datasource:
     username: user
-    password: password
+    password: smns
   h2:
     console:
       enabled: true

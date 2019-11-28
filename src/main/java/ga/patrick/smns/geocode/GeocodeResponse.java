@@ -31,11 +31,10 @@ public class GeocodeResponse {
         @JsonAlias("formatted_address")
         String formattedAddress;
 
+        Geometry geometry;
+
         @Data
         public static class AddressComponent {
-
-            public static final String CITY_LEVEL = "administrative_area_level_1";
-            public static final String COUNTRY_LEVEL = "country";
 
             @JsonAlias("long_name")
             String longName;
@@ -45,6 +44,40 @@ public class GeocodeResponse {
 
             /** Types, such as "administrative_area_level_1", "political", "country"... */
             String[] types;
+
+            public enum ComponentType {
+                CITY_LEVEL ("administrative_area_level_1"),
+                COUNTRY_LEVEL ("country"),
+                POLITICAL ("political");
+
+                final String type;
+
+                public String getName() {
+                    return type;
+                }
+
+                ComponentType(String name) {
+                    this.type = name;
+                }
+            }
+        }
+
+        @Data
+        public static class Geometry {
+
+            Bounds bounds;
+
+            @Data
+            public static class Bounds {
+                Coordinate northeast;
+                Coordinate southwest;
+
+                @Data
+                public static class Coordinate {
+                    double lat;
+                    double lng;
+                }
+            }
         }
     }
 

@@ -8,6 +8,7 @@ import ga.patrick.smns.dto.ModelMapper;
 import ga.patrick.smns.dto.TemperatureDto;
 import ga.patrick.smns.geocode.GeocodeClient;
 import ga.patrick.smns.geocode.GeocodeResponse;
+import ga.patrick.smns.repository.LocationRepository;
 import ga.patrick.smns.repository.TemperatureRepository;
 import ga.patrick.smns.web.UiController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,33 +16,34 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import javax.annotation.Resource;
-
 import java.io.IOException;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
+@SuppressWarnings("WeakerAccess")
 @Service
 public class TestSharedService {
 
     @Autowired
-    UiController uiController;
+    public UiController uiController;
 
     @Autowired
-    ApiController apiController;
+    public ApiController apiController;
 
     @Resource
-    TemperatureRepository temperatureRepository;
+    public TemperatureRepository temperatureRepository;
+
+    @Resource
+    public LocationRepository locationRepository;
 
     @MockBean
-    GeocodeClient geocodeClientMock;
+    public GeocodeClient geocodeClientMock;
 
-    GeocodeResponse geocodeResponseExample;
+    public GeocodeResponse geocodeResponseExample;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -50,7 +52,6 @@ public class TestSharedService {
     private ModelMapper modelMapper;
 
     TestSharedService() throws IOException {
-//        Mockito.when(geocodeClientMock.geocode("")).thenReturn(new GeocodeResponse());
 
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
@@ -59,28 +60,28 @@ public class TestSharedService {
                 GeocodeResponse.class);
     }
 
-    TemperatureDto map(Temperature t) {
+    public TemperatureDto map(Temperature t) {
         return modelMapper.toDto(t);
     }
 
-    ResultActions performGetIndex(MockMvc mockMvc) throws Exception {
+    public ResultActions performGetIndex(MockMvc mockMvc) throws Exception {
         return mockMvc.perform(get("/"));
     }
 
-    ResultActions performGetLatest(MockMvc mockMvc) throws Exception {
+    public ResultActions performGetLatest(MockMvc mockMvc) throws Exception {
         return mockMvc.perform(get("/api/latest"));
     }
 
-    ResultActions performGetLatest(MockMvc mockMvc, int count) throws Exception {
+    public ResultActions performGetLatest(MockMvc mockMvc, int count) throws Exception {
         return mockMvc.perform(get("/api/latest")
                 .param("count", String.valueOf(count)));
     }
 
-    ResultActions performGetLogin(MockMvc mockMvc) throws Exception {
+    public ResultActions performGetLogin(MockMvc mockMvc) throws Exception {
         return mockMvc.perform(get("/login"));
     }
 
-    ResultActions performPostAdd(MockMvc mockMvc, Temperature t) throws Exception {
+    public ResultActions performPostAdd(MockMvc mockMvc, Temperature t) throws Exception {
         TemperatureDto body = modelMapper.toDto(t);
         return mockMvc.perform(
                 post("/api/add")
@@ -88,16 +89,17 @@ public class TestSharedService {
                         .content(toJson(body)));
     }
 
-    String toJson(Object o) throws JsonProcessingException {
+    public String toJson(Object o) throws JsonProcessingException {
         return mapper.writeValueAsString(o);
     }
 
-    TemperatureDto parseTemperatureDto(String json) throws Exception {
+    public TemperatureDto parseTemperatureDto(String json) throws Exception {
         return mapper.readValue(json, TemperatureDto.class);
     }
 
-    void cleanup() {
+    public void cleanup() {
         temperatureRepository.deleteAll();
+        locationRepository.deleteAll();
     }
 
 }

@@ -39,8 +39,8 @@ public class Temperature {
     private Double lon;
 
     /** City and country of measurement */
-    @Column
-    private String location;
+    @ManyToOne
+    private Location location;
 
     @Column(nullable = false)
     private LocalDateTime datetime = LocalDateTime.now();

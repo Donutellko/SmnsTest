@@ -1,8 +1,7 @@
 package ga.patrick.smns.service;
 
-import ga.patrick.smns.domain.*;
-import ga.patrick.smns.repository.*;
-import lombok.AllArgsConstructor;
+import ga.patrick.smns.domain.Temperature;
+import ga.patrick.smns.repository.TemperatureRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,7 @@ public class TemperatureService {
     }
 
     public Temperature add(Temperature t) {
-        t.setLocation(geocodeService.getCityName(t.getLat(), t.getLon()));
+        t.setLocation(geocodeService.getLocation(t.getLat(), t.getLon()));
         return temperatureRepository.save(t);
     }
 
