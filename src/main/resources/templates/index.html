@@ -40,13 +40,14 @@
                 <th>Latitide</th>
                 <th>Longitude</th>
                 <th>Temperature</th>
+                <th>Location</th>
             </tr>
             <tr ng-repeat="input in latest track by input.id">
                 <td>{{input.id}}</td>
                 <td>{{input.time}}</td>
                 <td>{{input.lat}}</td>
                 <td>{{input.lon}}</td>
-                <td>{{input.value}}</td>
+                <td>{{input.location}}</td>
             </tr>
         </table>
     </div>
@@ -56,19 +57,19 @@
 
         <form>
             <label>Temperature
-                <input type="number" ng-model="input.value">
+                <input type="number" step="0.01" ng-model="input.value">
             </label>
 
             <br>
 
             <label>Latitude
-                <input type="number" ng-model="input.lat">
+                <input type="number" step="0.001" ng-model="input.lat">
             </label>
 
             <br>
 
             <label>Longitude
-                <input type="number" ng-model="input.lon">
+                <input type="number" step="0.001" ng-model="input.lon">
             </label>
 
             <br>

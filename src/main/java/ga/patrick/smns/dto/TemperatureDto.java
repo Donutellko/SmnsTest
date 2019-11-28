@@ -16,20 +16,19 @@ import java.time.LocalDateTime;
 public class TemperatureDto {
 
     @Null
-    private
-    Long id;
+    private Long id;
 
     @NotNull
-    private
-    Double lat;
+    private Double lat;
 
     @NotNull
-    private
-    Double lon;
+    private Double lon;
 
     @NotNull
-    private
-    Double value;
+    private Double value;
+
+    @Null
+    private String location;
 
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)

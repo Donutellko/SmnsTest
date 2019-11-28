@@ -1,16 +1,25 @@
 package ga.patrick.smns.api;
 
 import ga.patrick.smns.domain.Temperature;
+import ga.patrick.smns.dto.TemperatureDto;
+import ga.patrick.smns.geocode.GeocodeClient;
+import ga.patrick.smns.geocode.GeocodeResponse;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.*;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,10 +41,17 @@ public class ApiAddIntegrationTest {
             INVALID_LONGITUDE_MATCHER = Matchers.containsString("Invalid longitude: "),
             INVALID_TEMPERATURE_MATCHER = Matchers.containsString("Invalid temperature: ");
 
+//    @MockBean
+    @Autowired
+    GeocodeClient geocodeClientMock;
 
     @Before
     public void init() {
         testUtils.cleanup();
+
+        Mockito.when(geocodeClientMock.geocode(any())).thenReturn(testUtils.geocodeResponseExample);
+        Mockito.when(geocodeClientMock.decodeCityLevel(any(), any())).thenReturn(testUtils.geocodeResponseExample);
+//        Mockito.when(geocodeClientMock.decodeCityLevel( 0.0, 0.0)).thenReturn(new GeocodeResponse());
 
         mockMvc = MockMvcBuilders
                 .standaloneSetup(testUtils.apiController)
@@ -55,8 +71,13 @@ public class ApiAddIntegrationTest {
         double lon = 180;
         double temperature = -273.15;
 
-        testUtils.performPostAdd(mockMvc, new Temperature(temperature, lat, lon))
-                .andExpect(status().isOk());
+        MvcResult result = testUtils.performPostAdd(mockMvc, new Temperature(temperature, lat, lon))
+                .andExpect(status().isOk())
+                .andReturn();
+        String json = result.getResponse().getContentAsString();
+        TemperatureDto added = testUtils.parseTemperatureDto(json);
+        assertEquals("Россия, Санкт-Петербург", added.getLocation());
+
     }
 
     @Test

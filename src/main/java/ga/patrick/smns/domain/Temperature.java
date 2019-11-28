@@ -20,22 +20,27 @@ public class Temperature {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    /** Temperature.
+    /**
+     * Temperature.
      * Values are in Celsius, minimal value is -273.15.
      */
     @Column(nullable = false)
     @TemperatureConstraint
     private Double temperature;
 
-    /** Latitude of sensor. Value is between -90 and 90. */
+    /** Latitude of measurement . Value is between -90 and 90. */
     @Column(nullable = false)
     @LatitudeConstraint
     private Double lat;
 
-    /** Longitude of sensor. Value is between -180 and 180. */
+    /** Longitude of measurement. Value is between -180 and 180. */
     @Column(nullable = false)
     @LongitudeConstraint
     private Double lon;
+
+    /** City and country of measurement */
+    @Column
+    private String location;
 
     @Column(nullable = false)
     private LocalDateTime datetime = LocalDateTime.now();

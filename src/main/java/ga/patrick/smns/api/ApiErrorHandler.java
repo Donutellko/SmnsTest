@@ -55,8 +55,6 @@ public class ApiErrorHandler implements Filter {
             } else {
                 throw ex;
             }
-        } catch (Exception ex) {
-            throw ex;
         }
     }
 

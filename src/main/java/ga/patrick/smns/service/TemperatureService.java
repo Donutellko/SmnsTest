@@ -3,16 +3,19 @@ package ga.patrick.smns.service;
 import ga.patrick.smns.domain.*;
 import ga.patrick.smns.repository.*;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TemperatureService {
 
-    private TemperatureRepository temperatureRepository;
+    private final TemperatureRepository temperatureRepository;
+
+    private final GeocodeService geocodeService;
 
     public List<Temperature> lastInputs(int n) {
         return temperatureRepository.findByOrderByIdDesc(
@@ -21,6 +24,7 @@ public class TemperatureService {
     }
 
     public Temperature add(Temperature t) {
+        t.setLocation(geocodeService.getCityName(t.getLat(), t.getLon()));
         return temperatureRepository.save(t);
     }
 

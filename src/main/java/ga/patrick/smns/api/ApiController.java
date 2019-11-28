@@ -42,6 +42,7 @@ public class ApiController {
             @Validated @RequestBody TemperatureDto temp
     ) {
         Temperature added = temperatureService.add(modelMapper.toEntity(temp));
+
         return modelMapper.toDto(added);
     }
 

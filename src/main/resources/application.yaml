@@ -6,3 +6,6 @@ spring:
     console:
       enabled: true
       settings.web-allow-others: false
+  profiles:
+    include:
+      - geocode

@@ -13,7 +13,7 @@ stores it. The user is able to get the list of last 10 inputs.
 
 ## Optional, not compulsory (none, any or all):
 •	**DONE!** Basic authorization for both client and sensor  
-•	Extend the application by adding a feature to filter by city. The city should be retrieved automatically from the 
+•	**IN PROCESS:** Extend the application by adding a feature to filter by city. The city should be retrieved automatically from the 
     given coordinates  
 •	**ALMOST DONE (see issues)!** Implement basic UI (use your favorite JS framework)  
 You can describe, how would you do optional tasks in words in case it seems difficult or long for you  
@@ -37,9 +37,6 @@ Used technologies are:
   3. JUnit
   4. AngularJS
   5. Less
-
-More to come:
-  * Feign (with Geocode API)
 
 ## Endpoints
 
@@ -169,7 +166,7 @@ Response:
 }
 ```
 
-### Basic UI
+## Basic UI
 
 **Is in development. There are currently several issues:**
 * Error while performing getting /latest, when logged in as SENSOR.  
@@ -192,6 +189,18 @@ Some sort of cabinet for a user. It contains several elements:
   Available for role USER. Contains table, filled by 10 latest entries. Reload button.
 * Sensor zone:
   Fields for temperature, latitude and longitude. A button to send it. 
+
+## Geocode
+
+Retrieving of location is implemented using Google API.  
+Locations are retrieved during Add operation, and result is stored in database.  
+
+Google API key is set in `src/main/resources/application-geocode.yaml` like this:
+
+```yaml
+geocode:
+  apikey: # Google API key
+```
 
 ## Comments
 

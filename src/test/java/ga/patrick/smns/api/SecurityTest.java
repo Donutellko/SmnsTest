@@ -1,12 +1,16 @@
 package ga.patrick.smns.api;
 
 import ga.patrick.smns.domain.Temperature;
+import ga.patrick.smns.geocode.GeocodeClient;
+import ga.patrick.smns.geocode.GeocodeResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.web.FilterChainProxy;
@@ -15,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -38,9 +43,16 @@ public class SecurityTest {
     @Autowired
     FilterChainProxy springSecurityFilterChain;
 
+//    @MockBean
+    @Autowired
+    GeocodeClient geocodeClientMock;
+
     @Before
     public void init() {
         testUtils.cleanup();
+
+        Mockito.when(geocodeClientMock.geocode(any())).thenReturn(testUtils.geocodeResponseExample);
+        Mockito.when(geocodeClientMock.decodeCityLevel(any(), any())).thenReturn(testUtils.geocodeResponseExample);
 
         apiMock = MockMvcBuilders
                 .standaloneSetup(testUtils.apiController)
