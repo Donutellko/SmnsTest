@@ -1,12 +1,9 @@
 package ga.patrick.smns.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ga.patrick.smns.TestJpaConfig;
+import ga.patrick.smns.TestSharedService;
 import ga.patrick.smns.domain.Temperature;
-import ga.patrick.smns.dto.ModelMapper;
 import ga.patrick.smns.dto.TemperatureDto;
-import ga.patrick.smns.repository.TemperatureRepository;
-import ga.patrick.smns.service.TemperatureService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,22 +11,18 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertArrayEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest

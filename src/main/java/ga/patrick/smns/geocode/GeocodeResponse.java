@@ -52,7 +52,7 @@ public class GeocodeResponse {
 
                 final String type;
 
-                public String getName() {
+                public String toString() {
                     return type;
                 }
 

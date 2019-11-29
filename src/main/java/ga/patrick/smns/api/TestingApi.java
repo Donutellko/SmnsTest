@@ -42,10 +42,15 @@ public class TestingApi {
     ) {
         List<Temperature> added = new ArrayList<>();
         for (int i = 0; i < count; i++) {
+//            Temperature t = new Temperature(
+//                    (int) (100 * getRand(-273, 500)) / 100d,
+//                    getRand(-90, 90),
+//                    getRand(-180, 180)
+//            );
             Temperature t = new Temperature(
                     (int) (100 * getRand(-273, 500)) / 100d,
-                    getRand(-90, 90),
-                    getRand(-180, 180)
+                    getRand(59.5, 60.5), // lat
+                    getRand(29.0, 30.5)  // lon
             );
             added.add(temperatureService.add(t));
         }

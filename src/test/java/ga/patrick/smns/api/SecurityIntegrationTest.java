@@ -1,5 +1,6 @@
 package ga.patrick.smns.api;
 
+import ga.patrick.smns.TestSharedService;
 import ga.patrick.smns.domain.Temperature;
 import ga.patrick.smns.geocode.GeocodeClient;
 import org.junit.After;
@@ -47,8 +48,8 @@ public class SecurityIntegrationTest {
     public void init() {
         testUtils.cleanup();
 
-        Mockito.when(geocodeClientMock.geocode(any())).thenReturn(testUtils.geocodeResponseExample);
-        Mockito.when(geocodeClientMock.decodeCityLevel(any(), any())).thenReturn(testUtils.geocodeResponseExample);
+        Mockito.when(geocodeClientMock.geocode(any())).thenReturn(testUtils.geocodeResponseSpbExample);
+        Mockito.when(geocodeClientMock.decodeCityLevel(any(), any())).thenReturn(testUtils.geocodeResponseSpbExample);
 
         apiMock = MockMvcBuilders
                 .standaloneSetup(testUtils.apiController)

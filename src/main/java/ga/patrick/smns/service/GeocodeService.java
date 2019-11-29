@@ -27,7 +27,7 @@ public class GeocodeService {
         for (GeocodeResult result : response.getResults()) {
             for (AddressComponent component : result.getAddressComponents()) {
                 for (String comp_type : component.getTypes()) {
-                    if (type.getName().equals(comp_type)) {
+                    if (type.toString().equals(comp_type)) {
                         return component;
                     }
                 }
@@ -64,17 +64,22 @@ public class GeocodeService {
             GeocodeResult result = findResult(response, CITY_LEVEL);
 
             if (result != null && bounds != null) {
-                location = new Location();
-
-                location.setTop(bounds.getNortheast().getLat());
-                location.setRight(bounds.getNortheast().getLng());
-                location.setBottom(bounds.getSouthwest().getLat());
-                location.setLeft(bounds.getSouthwest().getLng());
-
-                location.setName(result.getFormattedAddress());
-
-                location = locationRepository.save(location);
+                location = new Location(
+                        result.getFormattedAddress(),
+                        bounds.getNortheast().getLat(), // top
+                        bounds.getNortheast().getLng(), // right
+                        bounds.getSouthwest().getLat(), // bottom
+                        bounds.getSouthwest().getLng()  // left
+                );
+            } else {
+                double top = (int) (lat * 10) / 10.0;
+                double left = (int) (lon * 10) / 10.0;
+                location = new Location(
+                        "Empty place",
+                        top + 0.1, left + 0.1,
+                        top - 0.1, left - 0.1);
             }
+            location = locationRepository.save(location);
         }
         return location;
     }
