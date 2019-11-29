@@ -26,9 +26,10 @@ public class ApiController {
      */
     @GetMapping("/latest")
     List<TemperatureDto> latestEntries(
-            @RequestParam(name = "count", defaultValue = "10") int n
+            @RequestParam(name = "count", defaultValue = "10") int n,
+            @RequestParam(name = "filter", defaultValue = "") String filter
     ) {
-        return temperatureService.lastInputs(n).stream()
+        return temperatureService.lastInputs(n, filter).stream()
                 .map(modelMapper::toDto)
                 .collect(Collectors.toList());
     }

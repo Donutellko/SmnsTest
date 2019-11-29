@@ -16,9 +16,9 @@ public class TemperatureService {
 
     private final GeocodeService geocodeService;
 
-    public List<Temperature> lastInputs(int n) {
-        return temperatureRepository.findByOrderByIdDesc(
-                PageRequest.of(0, n)
+    public List<Temperature> lastInputs(int n, String filter) {
+        return temperatureRepository.findFiltered(
+                PageRequest.of(0, n), "%" + filter.toLowerCase() + "%"
         );
     }
 

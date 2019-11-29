@@ -46,14 +46,18 @@ app.controller('userCtrl', function ($scope, $http, userFactory) {
 
     $scope.latest = [];
 
-    $scope.getLatest = function () {
-        $http.get("/api/latest").then(
-            (response) => {
-                console.log(response.data);
-                $scope.latest = response.data
-            },
-            (err) => handleError(err)
-        )
+    $scope.locationFilter = "";
+    $scope.latestCount = 10;
+
+    $scope.getLatest = function (filter = $scope.locationFilter, count = $scope.latestCount) {
+        $http.get(`/api/latest?filter=${filter.trim()}&count=${count}`)
+            .then(
+                (response) => {
+                    console.log(response.data);
+                    $scope.latest = response.data
+                },
+                (err) => handleError(err)
+            )
     };
 
     $scope.getLatest();
