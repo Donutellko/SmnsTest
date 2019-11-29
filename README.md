@@ -213,6 +213,10 @@ to them.
 But as soon as I get information from Geocode API just once for each city, I consider it to
 be good enough in terms of performance and cost (price per request).
 
+I also thought that it might be better to place added inputs into queue for retrieving locations,
+but I guess it's making this testing project too overcomplicated, and would span the time I spent
+on it even more, so I decide to stop at this state.
+
 ## Comments
 
 ### "last"
