@@ -13,9 +13,9 @@ stores it. The user is able to get the list of last 10 inputs.
 
 ## Optional, not compulsory (none, any or all):
 •	**DONE!** Basic authorization for both client and sensor  
-•	**IN PROCESS:** Extend the application by adding a feature to filter by city. The city should be retrieved automatically from the 
+•	**DONE!** Extend the application by adding a feature to filter by city. The city should be retrieved automatically from the 
     given coordinates  
-•	**ALMOST DONE (see issues)!** Implement basic UI (use your favorite JS framework)  
+•	**DONE!** Implement basic UI (use your favorite JS framework)  
 You can describe, how would you do optional tasks in words in case it seems difficult or long for you  
 
 
@@ -106,6 +106,7 @@ GET /api/latest
 
 Optional parameters:
 * count: required count of inputs. Default value is 10.
+* filter: a substring of location names to be filtered. 
 
 Expected response: 
 * `200 OK` and a JSON array of not more than `count` last entries (less, if not enough in database), containing:
@@ -114,6 +115,7 @@ Expected response:
   * `lat` latitude;
   * `lon` longitude;
   * `datetime` timestamp that was specified in `/add` request or a moment of adding it to database.
+  * `location` city and country, retrieved by coordinates; or "Empty space", if is not in a country (e.g. oceans). 
   Example: 
   ``` JSON
   [
@@ -123,6 +125,7 @@ Expected response:
         "lat": 10.0,
         "lon": 40.0,
         "datetime": "2019-11-21T15:04:02.888009"
+        "location": "Saint-Petersburg, Russia"
     }, ...
   ]
   ```
@@ -148,8 +151,9 @@ Optional parameters:
 Response:
 * JSON containing list of all generated inputs.
 
-The generated entries contain random values as temperature, longitude and latitude, and datetime is a timestamp of when 
-this entry was created.
+The generated entries contain some semi-random values as temperature, longitude and latitude, and datetime is a timestamp of when 
+this entry was created. 
+UPD: coordinates are in surroundings of Saint-Petersburg, so there is no too much requests to geocode API.
 
 ### Clear database
 
@@ -168,10 +172,7 @@ Response:
 
 ## Basic UI
 
-**Is in development. There are currently several issues:**
-* Error while performing getting /latest, when logged in as SENSOR.  
-* Error message for some operations, even if they have been successful.  
-* User is able to get only 10 latest inputs, however API supports specifying this number.  
+**There are currently several issues:**      
 * No datetime input for add operation, however API supports it.  
 * Design is ugly.  
 
@@ -186,14 +187,17 @@ Some sort of cabinet for a user. It contains several elements:
   Available for role ADMIN only. Contains two buttons: to populate DB with example data (entered into a field nearby), and 
   to clear the DB.
 * User zone:
-  Available for role USER. Contains table, filled by 10 latest entries. Reload button.
+  Available for role USER. Contains table, filled by 10 latest entries. 
+  Controls are: Reload button, Filter and Count fields.
 * Sensor zone:
-  Fields for temperature, latitude and longitude. A button to send it. 
+  Fields for temperature, latitude and longitude. A button to send it to server. 
 
 ## Geocode
 
 Retrieving of location is implemented using Google API.  
 Locations are retrieved during Add operation, and result is stored in database.  
+After retrieving Bounds information it is also stored in database, so we get information 
+for each city just once.
 
 Google API key is set in `src/main/resources/application-geocode.yaml` like this:
 
@@ -201,6 +205,12 @@ Google API key is set in `src/main/resources/application-geocode.yaml` like this
 geocode:
   apikey: # Google API key
 ```
+
+UPD: only after implementing the whole thing I realised that I could have been doing it
+in reverse way: by getting Bounds for some given city, and comparing all values in database
+to them.  
+But as soon as I get information from Geocode API just once for each city, I consider it to
+be good enough in terms of performance and cost (price per request).
 
 ## Comments
 

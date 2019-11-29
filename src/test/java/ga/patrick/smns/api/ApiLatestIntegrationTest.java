@@ -2,6 +2,7 @@ package ga.patrick.smns.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ga.patrick.smns.TestSharedService;
+import ga.patrick.smns.domain.Location;
 import ga.patrick.smns.domain.Temperature;
 import ga.patrick.smns.dto.TemperatureDto;
 import org.junit.After;
@@ -52,8 +53,14 @@ public class ApiLatestIntegrationTest {
                 .addFilters(apiErrorHandler)
                 .build();
 
+        Location l2 = new Location("Test location 2", 20, 20, 11, 11);
+        Location l1 = new Location("Test location 1", 10, 10, 0, 0);
+        testUtils.locationRepository.save(l1);
+        testUtils.locationRepository.save(l2);
+
         for (int i = 0; i < 15; i++) {
             Temperature t = new Temperature(i, i, i);
+            t.setLocation(i <= 10 ? l1 : l2);
             addedEntries.add(testUtils.map(testUtils.temperatureRepository.save(t)));
         }
     }

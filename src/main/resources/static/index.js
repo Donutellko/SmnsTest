@@ -60,7 +60,9 @@ app.controller('userCtrl', function ($scope, $http, userFactory) {
             )
     };
 
-    $scope.getLatest();
+    if (roles.indexOf('ROLE_USER') >= 0) {
+        $scope.getLatest();
+    }
 });
 
 app.controller('sensorCtrl', function ($scope, $http) {
