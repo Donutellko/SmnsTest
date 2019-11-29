@@ -197,7 +197,8 @@ Some sort of cabinet for a user. It contains several elements:
 Retrieving of location is implemented using Google API.  
 Locations are retrieved during Add operation, and result is stored in database.  
 After retrieving Bounds information it is also stored in database, so we get information 
-for each city just once.
+for each city just once. If some locations intersect (e.g. SPb and its Oblast), I choose the 
+smallest location by its area, as most specific.
 
 Google API key is set in `src/main/resources/application-geocode.yaml` like this:
 

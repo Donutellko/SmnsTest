@@ -57,7 +57,7 @@ public class GeocodeService {
     }
 
     public Location getLocation(Double lat, Double lon) {
-        Location location = locationRepository.find(lat, lon);
+        Location location = locationRepository.findTopBy(lat, lon);
         if (location == null) {
             GeocodeResponse response = geocodeClient.decodeCityLevel(lat, lon);
             Bounds bounds = getBounds(response, CITY_LEVEL);
